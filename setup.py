@@ -13,6 +13,7 @@ setuptools.setup(
     name="quantile-estimator",
     version=version.__version__,
     author="RefaceAI",
+    author_email="github-support@reface.ai",
     description=(
         "Python Implementation of Graham Cormode and S. "
         "Muthukrishnan's Effective Computation of Biased "
