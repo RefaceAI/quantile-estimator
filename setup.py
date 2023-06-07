@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from setuptools import setup
 
 setup(
@@ -12,7 +10,7 @@ setup(
                    "Quantiles over Data Streams in ICDE'05"),
     license = 'Apache License 2.0',
     url = 'https://github.com/matttproud/python_quantile_estimation',
-    packages = ['com', 'com/matttproud', 'com/matttproud/quantile'],
+    packages = ['quantile_estimator'],
     platforms = 'Platform Independent',
     classifiers = ['Development Status :: 3 - Alpha',
                    'Intended Audience :: Developers',

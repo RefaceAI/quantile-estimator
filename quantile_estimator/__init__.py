@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Copyright 2013 matt.proud@gmail.com  (Matt T. Proud)
 
