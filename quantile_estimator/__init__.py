@@ -40,7 +40,7 @@ class Estimator(object):
         if not invariants:
             self._invariants = _DEFAULT_INVARIANTS
         else:
-          self._invariants = [_Quantile(q, e) for (q, e) in invariants]
+            self._invariants = [_Quantile(q, e) for (q, e) in invariants]
         self._buffer = []
         self._head = None
         self._observations = 0
@@ -72,11 +72,10 @@ class Estimator(object):
 
         current = self._head
         if not current:
-          return 0
+            return float("nan")
 
         mid_rank = math.floor(rank * self._observations)
-        max_rank = mid_rank + math.floor(
-            self._invariant(mid_rank, self._observations) / 2)
+        max_rank = mid_rank + math.floor(self._invariant(mid_rank, self._observations) / 2)
 
         rank = 0.0
         while current._successor:
@@ -97,15 +96,18 @@ class Estimator(object):
 
     def _replace_batch(self):
         """Incorporates all pending values into the estimator."""
+        if not self._head and not self._buffer:
+            return
+
         if not self._head:
-          self._head, self._buffer = self._record(self._buffer[0], 1, 0, None), self._buffer[1:]
+            self._head, self._buffer = self._record(self._buffer[0], 1, 0, None), self._buffer[1:]
 
         rank = 0.0
         current = self._head
 
         for b in self._buffer:
             if b < self._head._value:
-              self._head = self._record(b, 1, 0, self._head)
+                self._head = self._record(b, 1, 0, self._head)
 
             while current._successor and current._value < b:
                 rank += current._rank
@@ -114,8 +116,7 @@ class Estimator(object):
             if not current._successor:
                 current._successor = self._record(b, 1, 0, None)
 
-            current._successor = self._record(b, 1, self._invariant(rank, self._observations)-1, current._successor)
-
+            current._successor = self._record(b, 1, self._invariant(rank, self._observations) - 1, current._successor)
 
     def _record(self, value, rank, delta, successor):
         """Catalogs a sample."""
@@ -123,7 +124,6 @@ class Estimator(object):
         self._items += 1
 
         return _Sample(value, rank, delta, successor)
-
 
     def _invariant(self, rank, n):
         """Computes the delta value for the sample."""
