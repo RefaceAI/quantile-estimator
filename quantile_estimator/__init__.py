@@ -17,11 +17,16 @@ Python Implementation of Graham Cormode and S. Muthukrishnan's Effective
 Computation of Biased Quantiles over Data Streams in ICDE'05
 """
 import math
+import time
 
 _BUFFER_SIZE = 512
 
 
-class Estimator(object):
+def time_ms():
+    return time.time_ns() // 1_000_000
+
+
+class Estimator:
     """Estimator estimates quantile values from sample streams in a time- and
     memory-efficient manner subject to allowed error constraints.
     """
@@ -154,7 +159,7 @@ class Estimator(object):
             current = current._successor
 
 
-class _Quantile(object):
+class _Quantile:
     """_Quantile is an internal representation of an estimation target
     invariant.
 
@@ -181,10 +186,61 @@ class _Quantile(object):
 _DEFAULT_INVARIANTS = [_Quantile(0.50, 0.01), _Quantile(0.99, 0.001)]
 
 
-class _Sample(object):
+class _Sample:
     """_Sample models an observational value."""
     def __init__(self, value, rank, delta, successor):
         self._value = value
         self._rank = rank
         self._delta = delta
         self._successor = successor
+
+
+class TimeWindowEstimator:
+    """Wrapper around Estimator.
+
+    Maintains a ring buffer of Estimators to provide quantiles over a sliding windows of time.
+
+    Original idea:
+    https://github.com/prometheus/client_java/blob/master/simpleclient/src/main/java/io/prometheus/client/TimeWindowQuantiles.java
+    """
+
+    def __init__(self, *invariants, max_age_seconds=10 * 60, age_buckets=5):
+        self.invariants = invariants
+        self.max_age_seconds = max_age_seconds
+        self.age_buckets = age_buckets
+        self.ring_buckets = [self.get_new_bucket() for _ in range(self.age_buckets)]
+        self.current_bucket = 0
+        self.last_rotate_time_ms = time_ms()
+        self.duration_between_rotates_ms = self.max_age_seconds * 1000 // age_buckets
+
+        # needed for original aioprometheus Summary metric
+        # https://github.com/claws/aioprometheus
+        self._observations = 0
+        self._sum = 0
+        self._invariants = self.ring_buckets[0]._invariants
+
+    def get_new_bucket(self):
+        return Estimator(*self.invariants)
+
+    def observe(self, value):
+        self.rotate_buckets()
+        for bucket in self.ring_buckets:
+            bucket.observe(value)
+
+        self._observations += 1
+        self._sum += value
+
+    def query(self, rank):
+        self.rotate_buckets()
+        return self.ring_buckets[self.current_bucket].query(rank)
+
+    def rotate_buckets(self):
+        time_since_last_rotate_ms = time_ms() - self.last_rotate_time_ms
+        while time_since_last_rotate_ms > self.duration_between_rotates_ms:
+            self.ring_buckets[self.current_bucket] = self.get_new_bucket()
+            self.current_bucket += 1
+            if self.current_bucket >= self.age_buckets:
+                self.current_bucket = 0
+
+            time_since_last_rotate_ms -= self.duration_between_rotates_ms
+            self.last_rotate_time_ms += self.duration_between_rotates_ms
