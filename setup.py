@@ -20,6 +20,7 @@ setuptools.setup(
         "Quantiles over Data Streams in ICDE'05"
     ),
     long_description=readfile("README.md"),
+    long_description_content_type="text/markdown",
     license="Apache License 2.0",
     url="https://github.com/RefaceAI/quantile-estimator",
     packages=["quantile_estimator"],
