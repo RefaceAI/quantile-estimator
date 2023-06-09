@@ -5,5 +5,5 @@ Python Implementation of Graham Cormode and S. Muthukrishnan's Effective Computa
 
 ## Installation
 ```
-pip install quantile-estimator==0.1.0
+pip install quantile-estimator==0.1.1
 ```
