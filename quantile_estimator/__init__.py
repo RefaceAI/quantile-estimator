@@ -19,6 +19,8 @@ Computation of Biased Quantiles over Data Streams in ICDE'05
 import math
 import time
 
+from .version import __version__
+
 _BUFFER_SIZE = 512
 
 
