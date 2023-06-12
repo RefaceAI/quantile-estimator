@@ -11,4 +11,4 @@ def test_random_observations(num_observations):
     for _ in range(num_observations):
         estimator.observe(random.randint(1, 1000) / 100)
 
-    assert 1 <= estimator.query(0.5) <= estimator.query(0.9) <= estimator.query(0.99) <= 1000
+    assert 0 <= estimator.query(0.5) <= estimator.query(0.9) <= estimator.query(0.99) <= 10
