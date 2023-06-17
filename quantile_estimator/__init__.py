@@ -81,6 +81,14 @@ class Estimator:
         if not current:
             return float("nan")
 
+        if rank == 0.0:
+            return current._value
+
+        if rank == 1.0:
+            while current._successor:
+                current = current._successor
+            return current._value
+
         mid_rank = math.floor(rank * self._observations)
         max_rank = mid_rank + math.floor(self._invariant(mid_rank, self._observations) / 2)
 
@@ -174,8 +182,8 @@ class _Quantile:
     def __init__(self, quantile, inaccuracy):
         self._quantile = quantile
         self._inaccuracy = inaccuracy
-        self._coefficient_i = (2.0 * inaccuracy) / (1.0 - quantile)
-        self._coefficient_ii = 2.0 * inaccuracy / quantile
+        self._coefficient_i = (2.0 * inaccuracy) / (1.0 - quantile) if quantile != 1. else float("nan")
+        self._coefficient_ii = 2.0 * inaccuracy / quantile if quantile != .0 else float("nan")
 
     """Computes the delta for the observation."""
     def _delta(self, rank, n):
