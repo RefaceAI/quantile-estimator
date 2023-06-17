@@ -5,7 +5,7 @@ Python Implementation of Graham Cormode and S. Muthukrishnan's Effective Computa
 
 ## Installation
 ```
-pip install quantile-estimator==0.1.1
+pip install quantile-estimator==0.1.2
 ```
 
 This package can be found on [PyPI](https://pypi.org/project/quantile-estimator/).
