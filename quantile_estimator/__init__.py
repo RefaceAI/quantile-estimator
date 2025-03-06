@@ -225,6 +225,7 @@ class TimeWindowEstimator:
 
         # needed for original aioprometheus Summary metric
         # https://github.com/claws/aioprometheus
+        # TODO: probably need to drop it, as aioprometheus project looks abandoned
         self._observations = 0
         self._sum = 0
         self._invariants = self.ring_buckets[0]._invariants
