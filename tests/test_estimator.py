@@ -15,7 +15,7 @@ def test_random_observations(num_observations):
 
 
 def test_border_invariants():
-    estimator = Estimator((0.0, 0.), (1.0, 0.))
+    estimator = Estimator((0.0, 0.0), (1.0, 0.0))
 
     values = [random.randint(1, 1000) for _ in range(1000)]
     for x in values:
