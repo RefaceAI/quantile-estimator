@@ -48,10 +48,10 @@ class Estimator:
             self._invariants = _DEFAULT_INVARIANTS
         else:
             self._invariants = [_Quantile(q, e) for (q, e) in invariants]
+
         self._buffer = []
         self._head = None
         self._observations = 0
-        self._items = 0
 
     def observe(self, value):
         """Samples an observation's value.
@@ -90,7 +90,7 @@ class Estimator:
             return current._value
 
         mid_rank = math.floor(rank * self._observations)
-        max_rank = mid_rank + math.floor(self._invariant(mid_rank, self._observations) / 2)
+        max_rank = mid_rank + math.ceil(self._invariant(mid_rank, self._observations) / 2)
 
         rank = 0.0
         while current._successor:
@@ -115,7 +115,8 @@ class Estimator:
             return
 
         if not self._head:
-            self._head, self._buffer = self._record(self._buffer[0], 1, 0, None), self._buffer[1:]
+            self._head = self._record(self._buffer[0], 1, 0, None)
+            self._buffer = self._buffer[1:]
 
         rank = 0.0
         current = self._head
@@ -136,7 +137,6 @@ class Estimator:
     def _record(self, value, rank, delta, successor):
         """Catalogs a sample."""
         self._observations += 1
-        self._items += 1
 
         return _Sample(value, rank, delta, successor)
 
@@ -187,10 +187,10 @@ class _Quantile:
 
     """Computes the delta for the observation."""
     def _delta(self, rank, n):
-        if rank <= math.floor((self._quantile * n)):
+        if rank <= math.floor(self._quantile * n):
             return self._coefficient_i * (n - rank)
-
-        return self._coefficient_ii * rank
+        else:
+            return self._coefficient_ii * rank
 
 
 _DEFAULT_INVARIANTS = [_Quantile(0.50, 0.01), _Quantile(0.99, 0.001)]
